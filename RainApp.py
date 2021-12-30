@@ -1,6 +1,6 @@
 '''Rainfall Map App'''
 import numpy as np, pandas as pd, streamlit as st, datetime
-st.title('Rainfall in Scotland 🏴󠁧󠁢󠁳󠁣󠁴󠁿')
+st.title('Rainfall in Scotland')
 
 # Source Data
 @st.cache
