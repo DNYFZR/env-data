@@ -1,7 +1,5 @@
 '''Rainfall Map App'''
-import numpy as np, pandas as pd, streamlit as st, datetime
-st.title('Rainfall in Scotland')
-
+import pandas as pd, streamlit as st
 ### Functions ###
 
 # Source Data
@@ -14,6 +12,7 @@ def source_data():
     df = df.drop(columns = ['station_no', 'station_number'])
     df.columns = cols
 
+    df['Timestamp_str'] = [i.strftime('%d-%m-%Y') for i in df['Timestamp']]
     df['Year'] = [i.year for i in df['Timestamp']]
     df['Month'] = [i.month for i in df['Timestamp']]
     df['Rainfall'] = df['Rainfall'].astype(int)
@@ -32,17 +31,18 @@ def convert_df(df):
 def time_stats(base_data):
     dates = base_data['Timestamp'].unique()
     time_data = pd.DataFrame(index=dates, columns=['Min Rainfall','Mean Rainfall', 'Max Rainfall'])
-    
+
     for i in time_data.index:
         time_data.loc[i, 'Mean Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall'].mean().astype(int)
         time_data.loc[i, 'Max Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall'].max().astype(int)
         time_data.loc[i, 'Min Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall'].min().astype(int)
-
+    
     return time_data
 
 ### App Build ###
+st.title('''Historic Scottish Rainfall Data''')
 
-# Page filters
+# Filters
 col1, col2 = st.columns(2)
 
 filter_station = ['All']
@@ -55,8 +55,7 @@ for i in df['Year'].sort_values(ascending=False).unique():
     filter_year.append(i)
 selected_year = col2.selectbox('Year', filter_year)
 
-# Map
-st.subheader('Map of stations')
+# Map data
 if selected_station == 'All' and selected_year == 'All':
     map_data = df.copy()
 elif selected_station == 'All' and selected_year != 'All':
@@ -66,42 +65,31 @@ elif selected_station != 'All' and selected_year == 'All':
 else:
     map_data = df[(df['Year'] == int(selected_year)) & (df['Station Name'] == selected_station)].copy()
 
-st.map(map_data) 
+map_chart = map_data.copy().drop(columns=['Year', 'Month', 'Timestamp_str'])
 
-# Map data table
-st.text('Mapped Data')
-map_data
+# Map viz
+st.map(map_chart)
+map_chart
 
 st.download_button(
     label="Download Mapped Data", 
-    data=convert_df(map_data), 
+    data=convert_df(map_chart),
     file_name='map_data.csv', 
     mime='text/csv')
 
-# Time series chart
-st.subheader('Rainfall Time Chart')
-time_data = time_stats(map_data)
+# Time series chart & table
+st.header('Rainfall Over Time')
+time_data = time_stats(map_chart)
 
-time_data_chart = time_data.copy()
-time_data_chart.index = [datetime.date(int(i[-4:]), int(i[3:5]), int(i[:2])) for i in time_data_chart.index]
-st.line_chart(time_data_chart)
+time_chart = time_data.copy()
+time_chart.index = time_chart.index.map({k: pd.to_datetime(k, format='%d-%m-%Y') for k in time_chart.index})
+st.line_chart(time_chart)
 
-time_data
+time_data 
 
 # Download option
 st.download_button(
     label="Download Summary Data", 
     data=convert_df(time_data), 
-    file_name='all_data.csv', 
-    mime='text/csv')
-
-# All data 
-st.subheader('Data Table')
-df
-
-# Download option
-st.download_button(
-    label="Download All Data", 
-    data=convert_df(df), 
     file_name='all_data.csv', 
     mime='text/csv')
