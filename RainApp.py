@@ -1,10 +1,11 @@
 '''Rainfall Map App'''
 import numpy as np, pandas as pd, streamlit as st, datetime
+st.title('Rainfall in Scotland')
 
 ### Functions ###
 
 # Source Data
-@st.cache
+@st.cache(allow_output_mutation=True)
 def source_data():
     cols = ['Timestamp', 'Rainfall', 'Station Name', 'latitude', 'longitude']
     url = 'https://raw.githubusercontent.com/sciDelta/API-ETL-SEPA-rainfall/main/SEPA_API_ETL_v2%20output.csv'
@@ -40,7 +41,6 @@ def time_stats(base_data):
     return time_data
 
 ### App Build ###
-st.title('Rainfall in Scotland')
 
 # Page filters
 col1, col2 = st.columns(2)
@@ -70,7 +70,6 @@ st.map(map_data)
 
 # Map data table
 st.text('Mapped Data')
-map_data['Timestamp'] = [datetime.datetime.strftime(i, '%d-%m-%Y') for i in map_data['Timestamp']]
 map_data
 
 st.download_button(
@@ -98,7 +97,6 @@ st.download_button(
 
 # All data 
 st.subheader('Data Table')
-df['Timestamp'] = [datetime.datetime.strftime(i, '%d-%m-%Y') for i in df['Timestamp']]
 df
 
 # Download option
