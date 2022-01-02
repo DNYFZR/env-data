@@ -42,9 +42,9 @@ selected_year = col2.selectbox('Year', filter_year)
 st.subheader('Map of stations')
 if selected_station == 'All' and selected_year == 'All':
     map_data = df.copy()
-if selected_station == 'All' and selected_year != 'All':
+elif selected_station == 'All' and selected_year != 'All':
     map_data = df[df['Year'] == selected_year].copy()
-if selected_station != 'All' and selected_year == 'All':
+elif selected_station != 'All' and selected_year == 'All':
     map_data = df[df['Station Name'] == selected_station].copy()
 else:
     map_data = df[(df['Year'] == selected_year) & (df['Station Name'] == selected_station)].copy()
