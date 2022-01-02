@@ -28,7 +28,7 @@ def convert_df(df):
     return df.to_csv().encode('utf-8')
 
 # Time series stats
-@st.cache
+@st.cache(allow_output_mutation=True)
 def time_stats(base_data):
     dates = base_data['Timestamp'].unique()
     time_data = pd.DataFrame(index=dates, columns=['Min Rainfall','Mean Rainfall', 'Max Rainfall'])
