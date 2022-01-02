@@ -3,7 +3,7 @@ import numpy as np, pandas as pd, streamlit as st, datetime
 st.title('Rainfall in Scotland')
 
 # Source Data
-@st.cache
+#@st.cache
 def source_data():
     cols = ['Timestamp', 'Rainfall', 'Station Name', 'latitude', 'longitude']
     url = 'https://raw.githubusercontent.com/sciDelta/API-ETL-SEPA-rainfall/main/SEPA_API_ETL_v2%20output.csv'
@@ -21,7 +21,7 @@ def source_data():
 df = source_data()
 
 # Download converter
-@st.cache
+#@st.cache
 def convert_df(df):
     return df.to_csv().encode('utf-8')
 
@@ -47,11 +47,13 @@ elif selected_station == 'All' and selected_year != 'All':
 elif selected_station != 'All' and selected_year == 'All':
     map_data = df[df['Station Name'] == selected_station].copy()
 else:
-    map_data = df[(df['Year'] == selected_year) & (df['Station Name'] == selected_station)].copy()
+    map_data = df[(df['Year'] == int(selected_year)) & (df['Station Name'] == selected_station)].copy()
 
 st.map(map_data) 
 
 st.text('Mapped Data')
+
+map_data['Timestamp'] = [datetime.datetime.strftime(i, '%d-%m-%Y') for i in map_data['Timestamp']]
 map_data
 
 st.download_button(
@@ -62,10 +64,11 @@ st.download_button(
 
 # Time chart
 st.subheader('Rainfall Time Chart')
-@st.cache
+#@st.cache
 def time_stats(base_data):
     dates = base_data['Timestamp'].unique()
     time_data = pd.DataFrame(index=dates, columns=['Min Rainfall','Mean Rainfall', 'Max Rainfall'])
+    
     for i in time_data.index:
         time_data.loc[i, 'Mean Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall'].mean().astype(int)
         time_data.loc[i, 'Max Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall'].max().astype(int)
@@ -73,7 +76,10 @@ def time_stats(base_data):
     return time_data
 
 time_data = time_stats(map_data)
-st.line_chart(time_data)
+time_data_chart = time_data.copy()
+time_data_chart.index = [datetime.date(int(i[-4:]), int(i[3:5]), int(i[:2])) for i in time_data_chart.index]
+st.line_chart(time_data_chart)
+
 time_data
 
 # Download option
@@ -85,6 +91,7 @@ st.download_button(
 
 # Data 
 st.subheader('Data Table')
+df['Timestamp'] = [datetime.datetime.strftime(i, '%d-%m-%Y') for i in df['Timestamp']]
 df
 
 # Download option
