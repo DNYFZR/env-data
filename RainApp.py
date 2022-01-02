@@ -43,7 +43,7 @@ st.subheader('Map of stations')
 if selected_station == 'All' and selected_year == 'All':
     map_data = df.copy()
 elif selected_station == 'All' and selected_year != 'All':
-    map_data = df[df['Year'] == selected_year].copy()
+    map_data = df[df['Year'] == int(selected_year)].copy()
 elif selected_station != 'All' and selected_year == 'All':
     map_data = df[df['Station Name'] == selected_station].copy()
 else:
