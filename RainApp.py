@@ -1,9 +1,10 @@
 '''Rainfall Map App'''
 import numpy as np, pandas as pd, streamlit as st, datetime
-st.title('Rainfall in Scotland')
+
+### Functions ###
 
 # Source Data
-#@st.cache
+@st.cache
 def source_data():
     cols = ['Timestamp', 'Rainfall', 'Station Name', 'latitude', 'longitude']
     url = 'https://raw.githubusercontent.com/sciDelta/API-ETL-SEPA-rainfall/main/SEPA_API_ETL_v2%20output.csv'
@@ -21,9 +22,25 @@ def source_data():
 df = source_data()
 
 # Download converter
-#@st.cache
+@st.cache
 def convert_df(df):
     return df.to_csv().encode('utf-8')
+
+# Time series stats
+@st.cache
+def time_stats(base_data):
+    dates = base_data['Timestamp'].unique()
+    time_data = pd.DataFrame(index=dates, columns=['Min Rainfall','Mean Rainfall', 'Max Rainfall'])
+    
+    for i in time_data.index:
+        time_data.loc[i, 'Mean Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall'].mean().astype(int)
+        time_data.loc[i, 'Max Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall'].max().astype(int)
+        time_data.loc[i, 'Min Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall'].min().astype(int)
+
+    return time_data
+
+### App Build ###
+st.title('Rainfall in Scotland')
 
 # Page filters
 col1, col2 = st.columns(2)
@@ -51,8 +68,8 @@ else:
 
 st.map(map_data) 
 
+# Map data table
 st.text('Mapped Data')
-
 map_data['Timestamp'] = [datetime.datetime.strftime(i, '%d-%m-%Y') for i in map_data['Timestamp']]
 map_data
 
@@ -62,20 +79,10 @@ st.download_button(
     file_name='map_data.csv', 
     mime='text/csv')
 
-# Time chart
+# Time series chart
 st.subheader('Rainfall Time Chart')
-#@st.cache
-def time_stats(base_data):
-    dates = base_data['Timestamp'].unique()
-    time_data = pd.DataFrame(index=dates, columns=['Min Rainfall','Mean Rainfall', 'Max Rainfall'])
-    
-    for i in time_data.index:
-        time_data.loc[i, 'Mean Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall'].mean().astype(int)
-        time_data.loc[i, 'Max Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall'].max().astype(int)
-        time_data.loc[i, 'Min Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall'].min().astype(int)
-    return time_data
-
 time_data = time_stats(map_data)
+
 time_data_chart = time_data.copy()
 time_data_chart.index = [datetime.date(int(i[-4:]), int(i[3:5]), int(i[:2])) for i in time_data_chart.index]
 st.line_chart(time_data_chart)
@@ -89,7 +96,7 @@ st.download_button(
     file_name='all_data.csv', 
     mime='text/csv')
 
-# Data 
+# All data 
 st.subheader('Data Table')
 df['Timestamp'] = [datetime.datetime.strftime(i, '%d-%m-%Y') for i in df['Timestamp']]
 df
