@@ -66,7 +66,6 @@ map_chart = map_data.copy().drop(columns=['Year'])
 
 # Map viz
 st.map(map_chart)
-map_chart.index = map_chart.index.map({k: dt.datetime.strftime(k, format='%d-%m-%Y') for k in map_chart.index})
 map_chart
 
 st.download_button(
