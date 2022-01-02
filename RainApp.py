@@ -1,5 +1,5 @@
 '''Rainfall Map App'''
-import datetime as dt, pandas as pd, streamlit as st
+import pandas as pd, streamlit as st
 ### Functions ###
 
 # Source Data
@@ -11,9 +11,9 @@ def source_data():
     df = pd.read_csv(url, parse_dates=[0])
     df = df.drop(columns = ['station_no', 'station_number'])
     df.columns = cols
-
     df['Year'] = [i.year for i in df['Timestamp']]
     df['Rainfall'] = df['Rainfall'].astype(int)
+
     return df
 
 df = source_data()
@@ -77,9 +77,11 @@ st.download_button(
 # Time series chart & table
 st.header('Rainfall Over Time')
 time_data = time_stats(map_chart)
-st.line_chart(time_data)
 
-time_data.index = time_data.index.map({k: dt.datetime.strftime(k, format='%d-%m-%Y') for k in time_data.index})
+time_chart = time_data.copy()
+time_chart.index = time_chart.index.map({k: pd.to_datetime(k, format='%d-%m-%Y') for k in time_chart.index})
+st.line_chart(time_chart)
+
 time_data 
 
 # Download option
