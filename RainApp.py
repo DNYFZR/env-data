@@ -1,5 +1,5 @@
 '''Rainfall Map App'''
-import pandas as pd, streamlit as st
+import datetime as dt, pandas as pd, streamlit as st
 ### Functions ###
 
 # Source Data
@@ -12,11 +12,8 @@ def source_data():
     df = df.drop(columns = ['station_no', 'station_number'])
     df.columns = cols
 
-    df['Timestamp_str'] = [i.strftime('%d-%m-%Y') for i in df['Timestamp']]
     df['Year'] = [i.year for i in df['Timestamp']]
-    df['Month'] = [i.month for i in df['Timestamp']]
     df['Rainfall'] = df['Rainfall'].astype(int)
-
     return df
 
 df = source_data()
@@ -65,7 +62,7 @@ elif selected_station != 'All' and selected_year == 'All':
 else:
     map_data = df[(df['Year'] == int(selected_year)) & (df['Station Name'] == selected_station)].copy()
 
-map_chart = map_data.copy().drop(columns=['Year', 'Month', 'Timestamp_str'])
+map_chart = map_data.copy().drop(columns=['Year'])
 
 # Map viz
 st.map(map_chart)
@@ -80,11 +77,9 @@ st.download_button(
 # Time series chart & table
 st.header('Rainfall Over Time')
 time_data = time_stats(map_chart)
+st.line_chart(time_data)
 
-time_chart = time_data.copy()
-time_chart.index = time_chart.index.map({k: pd.to_datetime(k, format='%d-%m-%Y') for k in time_chart.index})
-st.line_chart(time_chart)
-
+time_data.index = time_data.index.map({k: dt.datetime.strftime(k, format='%d-%m-%Y') for k in time_data.index})
 time_data 
 
 # Download option
