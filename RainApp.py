@@ -37,7 +37,7 @@ def time_stats(base_data):
     return time_data
 
 ### App Build ###
-st.title('''Historic Scottish Rainfall Data''')
+st.title('''Scottish Rainfall API Data''')
 
 # Filters
 col1, col2 = st.columns(2)
