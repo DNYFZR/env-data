@@ -50,7 +50,7 @@ selected_station = col1.selectbox('Station', filter_station)
 filter_year = ['All']
 for i in df['Year'].sort_values(ascending=False).unique():
     filter_year.append(i)
-selected_year = col2.selectbox('Year', filter_year)
+selected_year = col2.multiselect('Year', filter_year)
 
 # Map data
 if selected_station == 'All' and selected_year == 'All':
