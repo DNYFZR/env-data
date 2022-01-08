@@ -23,7 +23,7 @@ end = col2.date_input(label='End Date', value = today)
 # API data extract
 @st.cache(allow_output_mutation=True)
 def update_data():
-    return get_api_data(start_date=start, end_date=end)
+    return get_api_data(start_date=start, end_date=end + datetime.timedelta(days=1))
 
 df = update_data()
 
