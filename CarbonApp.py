@@ -6,7 +6,7 @@ sns.set()
 
 st.title('♻ Carbon Intensity App ♻')
 st.markdown('**This app can show forecasts for up to 2 days ahead as well as historic data**')
-st.markdown('Developer: Daniel [@sciDelta](https://twitter.com/sciDelta)')
+st.markdown('Contact: [@sciDelta](https://twitter.com/sciDelta)')
 today = datetime.datetime.today()
 
 # Download data converter
