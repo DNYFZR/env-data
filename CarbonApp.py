@@ -71,7 +71,7 @@ plt.ylabel('Generation %')
 plt.ylim(0,100)
 plt.legend(['Fossil Fuels', 'Nuclear', 'Renewables'])
 
-if start >= end - datetime.timedelta(days=1):
+if start == end:
     plt.title(f'{sel_box} Energy Mix \n{started}', size = 14)
     dtFmt = mdates.DateFormatter('%H:%M')
 else:
@@ -84,8 +84,6 @@ dtFmt = mdates.DateFormatter('%b-%d') # define the formatting
 plt.gca().xaxis.set_major_formatter(dtFmt) # apply the format to the desired axis
 
 st.pyplot(fig_energy)
-st.text(start)
-st.text(end - datetime.timedelta(days=1))
 
 st.download_button(
     label="Download Chart Data", 
