@@ -71,13 +71,13 @@ plt.ylabel('Generation %')
 plt.ylim(0,100)
 plt.legend(['Fossil Fuels', 'Nuclear', 'Renewables'])
 
-if started == ended:
+if start == end - datetime.timedelta(days=1):
     plt.title(f'{sel_box} Energy Mix \n{started}', size = 14)
     dtFmt = mdates.DateFormatter('%H:%M')
 else:
     plt.title(f'{sel_box} Energy Mix \n{started} to {ended}', size = 14)
     dtFmt = mdates.DateFormatter('%d-%b')
-    
+
 plt.tight_layout()
 
 dtFmt = mdates.DateFormatter('%b-%d') # define the formatting
