@@ -46,7 +46,8 @@ ended = df_time['end date'].max().strftime('%d-%b')
 fig_intensity = plt.figure(figsize=(10,6))
 
 plt.plot(df_time['start date'], df_time['intensity'])
-if started == ended:
+
+if start == end:
     plt.title(f'{sel_box} Carbon Intensity \n{started}', size = 14)
 else:
     plt.title(f'{sel_box} Carbon Intensity \n{started} to {ended}', size = 14)
@@ -73,9 +74,12 @@ plt.legend(['Fossil Fuels', 'Nuclear', 'Renewables'])
 
 if start == end:
     plt.title(f'{sel_box} Energy Mix \n{started}', size = 14)
-    dtFmt = mdates.DateFormatter('%H:%M')
 else:
     plt.title(f'{sel_box} Energy Mix \n{started} to {ended}', size = 14)
+
+if start == end:
+    dtFmt = mdates.DateFormatter('%H:%M') 
+else:
     dtFmt = mdates.DateFormatter('%d-%b')
 
 plt.tight_layout()
