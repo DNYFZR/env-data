@@ -41,7 +41,7 @@ df_time = df[df['shortname'] == sel_box].copy().reset_index(drop = True)
 
 # Plot charts
 started = df_time['start date'].min().strftime('%d-%b')
-ended = df_time['end date'].max().strftime('%d-%b')
+ended = df_time['start date'].max().strftime('%d-%b')
 
 fig_intensity = plt.figure(figsize=(10,6))
 
