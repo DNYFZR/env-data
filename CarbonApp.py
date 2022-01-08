@@ -52,7 +52,7 @@ else:
     plt.title(f'{sel_box} Carbon Intensity \n{started} to {ended}', size = 14)
 plt.tight_layout()
 
-dtFmt = mdates.DateFormatter('%d-%M %H:%m') # define the formatting
+dtFmt = mdates.DateFormatter('%d-%m %H:%M') # define the formatting
 plt.gca().xaxis.set_major_formatter(dtFmt) # apply the format to the desired axis
 
 st.pyplot(fig_intensity)
