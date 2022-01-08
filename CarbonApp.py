@@ -18,7 +18,7 @@ def convert_df(df):
 col1, col2 = st.columns(2)
 
 start = col1.date_input(label='Start Date', value = today)
-end = col2.date_input(label='End Date', value = datetime.date(today.year, today.month, today.day + 2))
+end = col2.date_input(label='End Date', value = today)
 
 # API data extract
 @st.cache(allow_output_mutation=True)
@@ -41,7 +41,7 @@ df_time = df[df['shortname'] == sel_box].copy().reset_index(drop = True)
 
 # Plot charts
 started = df_time['start date'].min().strftime('%d-%b')
-ended = pd.to_datetime(df_time['start date'].max()).strftime('%d-%b')
+ended = df_time['end date'].max().strftime('%d-%b')
 
 fig_intensity = plt.figure(figsize=(10,6))
 
