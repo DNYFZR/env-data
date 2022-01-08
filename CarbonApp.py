@@ -84,6 +84,8 @@ dtFmt = mdates.DateFormatter('%b-%d') # define the formatting
 plt.gca().xaxis.set_major_formatter(dtFmt) # apply the format to the desired axis
 
 st.pyplot(fig_energy)
+st.text(start)
+st.text(end - datetime.timedelta(days=1))
 
 st.download_button(
     label="Download Chart Data", 
