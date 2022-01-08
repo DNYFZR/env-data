@@ -49,15 +49,12 @@ plt.plot(df_time['start date'], df_time['intensity'])
 
 if start == end:
     plt.title(f'{sel_box} Carbon Intensity \n{started}', size = 14)
-else:
-    plt.title(f'{sel_box} Carbon Intensity \n{started} to {ended}', size = 14)
-plt.tight_layout()
-
-if start == end:
     dtFmt = mdates.DateFormatter('%H:%M') 
 else:
+    plt.title(f'{sel_box} Carbon Intensity \n{started} to {ended}', size = 14)
     dtFmt = mdates.DateFormatter('%d-%b')
 
+plt.tight_layout()
 plt.gca().xaxis.set_major_formatter(dtFmt) # apply the format to the desired axis
 
 st.pyplot(fig_intensity)
@@ -74,17 +71,12 @@ plt.legend(['Fossil Fuels', 'Nuclear', 'Renewables'])
 
 if start == end:
     plt.title(f'{sel_box} Energy Mix \n{started}', size = 14)
+    dtFmt = mdates.DateFormatter('%H:%M')
 else:
     plt.title(f'{sel_box} Energy Mix \n{started} to {ended}', size = 14)
-
-if start == end:
-    dtFmt = mdates.DateFormatter('%H:%M') 
-else:
     dtFmt = mdates.DateFormatter('%d-%b')
 
 plt.tight_layout()
-
-dtFmt = mdates.DateFormatter('%b-%d') # define the formatting
 plt.gca().xaxis.set_major_formatter(dtFmt) # apply the format to the desired axis
 
 st.pyplot(fig_energy)
