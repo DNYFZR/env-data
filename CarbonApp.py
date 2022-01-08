@@ -71,7 +71,7 @@ plt.ylabel('Generation %')
 plt.ylim(0,100)
 plt.legend(['Fossil Fuels', 'Nuclear', 'Renewables'])
 
-if start - end <=2:
+if started == ended:
     plt.title(f'{sel_box} Energy Mix \n{started}', size = 14)
     dtFmt = mdates.DateFormatter('%H:%M')
 else:
