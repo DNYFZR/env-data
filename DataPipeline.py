@@ -1,49 +1,47 @@
 #### Carbon Intensity API Pipeline ####
+import requests, pandas as pd, datetime as dt
 def get_api_data(start_date, end_date):
-    import requests, pandas as pd, datetime as dt
+    if type(start_date) == str:
+        start_date = pd.to_datetime(start_date)
+    if type(end_date) == str:
+        end_date = pd.to_datetime(end_date)
 
-    def date_list(start, end, interval):
-        date_list = list()
-
-        if start == end:
-            date_list.append( (str(start), str(end + dt.timedelta(days = interval)) ) )
-        
-        else:
-            i = start
-            while i < end:
-                first = i
-                last = i + dt.timedelta(days = interval) 
-                date_list.append( (str(first), str(last)) )
-                i += dt.timedelta(days = interval)
-        return date_list
-
-    # NatGrid Carbon Intensity UK Regions API
     api_url = 'https://api.carbonintensity.org.uk/regional/intensity/{}T00:30Z/{}T00:00Z'
     headers = {'Accept': 'application/json'}
+
     df_mix = pd.DataFrame()
+    date_list = list()
 
-    api_date = date_list(start = start_date, end = end_date, interval = 1)
+    if start_date == end_date:
+        date_list.append( (str(start_date), str(end_date + dt.timedelta(days = 1)) ) )
+    else:
+        i = start_date
+        while i < end_date:
+            first = i
+            last = i + dt.timedelta(days = 1) 
+            date_list.append( (str(first), str(last)) )
+            i += dt.timedelta(days = 1)
 
-    # test
-    for i, tup in enumerate(api_date):
-        req = requests.get(api_url.format(api_date[i][0], api_date[i][1]), params={}, headers = headers)
+    # Extract JSON from API
+    for i in range(len(date_list)):
+        url = api_url.format(date_list[i][0], date_list[i][1])
+        req = requests.get(url, params={}, headers = headers)
 
-        # Pandas DataFrame
-        for j in range(48):
-            if len(req.json()['data']) <= j:
+        for j in range(48): # 48 half hours per day
+            if len(req.json()['data']) <= j: 
                 pass
             else:
                 df = pd.DataFrame(req.json()['data'][j]['regions'])
                 df['intensity'] = [i['forecast'] for i in df['intensity']]
 
                 # Start & end timestamps
-                df['start date'] = pd.to_datetime(req.json()['data'][j]['from'])
-                df['end date'] = pd.to_datetime(req.json()['data'][j]['to'])
+                df['start date'] = req.json()['data'][j]['from']
+                df['end date'] = req.json()['data'][j]['to']
 
                 # Combine with main df
                 df_mix = pd.concat([df_mix, df], axis=0)
 
-    # Extract generation mix data
+    # Extract data from JSON
     df_mix = df_mix.reset_index(drop = True)
     biomass, coal, imports, gas, nuclear, other, hydro, solar, wind = {}, {}, {}, {}, {}, {}, {}, {}, {}
 
@@ -72,11 +70,11 @@ def get_api_data(start_date, end_date):
         if col == 'generationmix':
             del df_mix[col]
 
-    # dates
-    df_mix['start date'] = df_mix['start date'].dt.strftime('%Y-%m-%d %H:%M')
-    df_mix['end date'] = df_mix['end date'].dt.strftime('%Y-%m-%d %H:%M')
-
     # Fix North Wales & Merseyside tag
     df_mix['shortname'] = ['North Wales and Merseyside' if i == 'North Wales & Merseyside' else i for i in df_mix['shortname']]
 
     return df_mix
+
+if __name__ == '__main__':
+    df = get_api_data(dt.date(2022,1,1), dt.date(2022,1,1))
+    print(df.head())
