@@ -6,7 +6,8 @@ sns.set()
 
 st.title('♻ Carbon Intensity App ♻')
 st.markdown('**This app can show forecasts for up to 2 days ahead as well as historic data**')
-st.markdown('Contact: [@sciDelta](https://twitter.com/sciDelta)')
+st.markdown('If a long time period is selected the app may take some time to complete the API query.')
+
 today = datetime.datetime.today()
 
 # Download data converter
@@ -54,6 +55,7 @@ else:
     plt.title(f'{sel_box} Carbon Intensity \n{started} to {ended}', size = 14)
     dtFmt = mdates.DateFormatter('%d-%b')
 
+plt.ylabel('kg CO2 / kWh Equiv.')
 plt.tight_layout()
 plt.gca().xaxis.set_major_formatter(dtFmt) # apply the format to the desired axis
 
@@ -120,13 +122,20 @@ def chart_data(dataframe):
     return df_out
 
 df_chart = chart_data(df.copy())
-df_chart
+df_app = df_chart.copy()
+df_app.iloc[:, 1:] = round(df_app.iloc[:, 1:], 1)
+df_app
 
 st.download_button(
     label="Download Summary Data", 
     data=convert_df(df_chart), 
     file_name='chart_data.csv', 
     mime='text/csv') 
+
+st.markdown('''
+    In the above table the data is in kg/kWh for intensity and the rest are percentages. \n
+    The columns after total are summations of individual % contributions. \n
+    ''')
 
 # Pies 
 df_pies = df_chart[['DNO Name', 'fossil fuels', 'nuclear', 'renewables', 'unknown']].copy().set_index('DNO Name', drop=True)
@@ -136,7 +145,7 @@ id_list = [i for i in df['shortname'].copy().unique()]
 n_rows = 6
 n_cols = 3
 
-pie_fig, ax = plt.subplots(nrows = n_rows, ncols = n_cols, figsize = (20, 30))
+pie_fig, ax = plt.subplots(nrows = n_rows, ncols = n_cols, figsize = (14, 28))
 for row in range(n_rows):
     for col in range(n_cols):
         i = id_list[0]
@@ -167,3 +176,5 @@ st.download_button(
     data=convert_df(df), 
     file_name='raw_data.csv', 
     mime='text/csv') 
+
+st.markdown('Contact: [@sciDelta](https://twitter.com/sciDelta)')
