@@ -11,4 +11,4 @@ This project contains two main scripts:
 - DataPipeline.py - this takes the selected dates and returns the raw half hourly data from the API in a dataframe.
 - CarbonApp.py - this transforms the data and also creates the streamlie app. 
 
-The streamlit app can be accessed here: https://t.co/h511FDLXBt
+The streamlit app can be accessed here: https://share.streamlit.io/scidelta/analytics-engineering/main/CarbonApp.py
