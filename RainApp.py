@@ -5,7 +5,7 @@ import pandas as pd, streamlit as st
 # Source Data
 @st.cache(allow_output_mutation=True)
 def source_data():
-    cols = ['Timestamp', 'Rainfall', 'Station Name', 'Latitude', 'Longitude']
+    cols = ['Timestamp', 'Rainfall (mm)', 'Station_name', 'Latitude', 'Longitude']
     url = 'https://raw.githubusercontent.com/sciDelta/API-ETL-SEPA-rainfall/main/data/SEPA_Monthly_2022-February-09.csv'
 
     df = pd.read_csv(url, parse_dates=[0])
