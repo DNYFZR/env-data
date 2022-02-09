@@ -5,11 +5,11 @@ import pandas as pd, streamlit as st
 # Source Data
 @st.cache(allow_output_mutation=True)
 def source_data():
-    cols = ['Timestamp', 'Rainfall', 'Station Name', 'latitude', 'longitude']
+    cols = ['Timestamp', 'Rainfall', 'Station Name', 'Latitude', 'Longitude']
     url = 'https://raw.githubusercontent.com/sciDelta/API-ETL-SEPA-rainfall/main/data/SEPA_Monthly_2022-February-09.csv'
 
     df = pd.read_csv(url, parse_dates=[0])
-    df = df.drop(columns = ['station_no', 'station_number'])
+    df = df.drop(columns = ['Station_no', 'Station_number'])
     df.columns = cols
     df['Year'] = [i.year for i in df['Timestamp']]
     df['Rainfall'] = df['Rainfall'].astype(int)
