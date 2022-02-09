@@ -1,29 +1,22 @@
 name: Auto API Extract
-
 on: 
   schedule:
     - cron:"0 0 10 * *"
-
  jobs:
       build:
         runs-on: ubuntu-latest
-    
         steps:
           - name: checkout repo content
             uses: actions/checkout@v2 # checkout the repository content to github runner.
-
           - name: setup python
             uses: actions/setup-python@v2
             with:
               python-version: 3.9 #install python
-
           - name: install dependencies
             run: pip install -r requirements.txt
-
           - name: execute api script # run the run.py to get the latest data
             run: |
               python SEPA_pipeline.py
-
           - name: Commit and push if data changes
             uses: data/SEPA_monthly.csv
             run: |
