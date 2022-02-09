@@ -1,5 +1,5 @@
 ''' SEPA Rainfall API ETL '''
-import requests, pandas as pd
+import requests, pandas as pd, datetime as dt
 
 # API ETL function
 def sepa_api_extract(table_url, base_url):    
@@ -59,8 +59,13 @@ def sepa_api_extract(table_url, base_url):
         
         return df_data
 
-# run API call on monthly data
+if __name__ == '__main__':
+    # run API call on monthly data
+    today = dt.datetime.strftime(dt.datetime.today(), '%Y-%b-%d')
+    
+    table_url = 'https://apps.sepa.org.uk/rainfall/api/Stations'
+    monthly_url = 'https://apps.sepa.org.uk/rainfall/api/Month/{}?all=true'
+    
+    rainfall_data = sepa_api_extract(table_url, monthly_url)
 
-table_url = 'https://apps.sepa.org.uk/rainfall/api/Stations'
-monthly_url = 'https://apps.sepa.org.uk/rainfall/api/Month/{}?all=true'
-rainfall_data = sepa_api_extract(table_url, monthly_url)
+    rainfall_data.to_csv(r'data/SEPA_Monthly_{}.csv'.format(today))
