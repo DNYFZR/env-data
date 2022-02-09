@@ -1,4 +1,4 @@
-name: Auto API Extract
+name: API_Extract
 on:
   push:
     branches:
