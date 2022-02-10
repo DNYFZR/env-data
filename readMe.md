@@ -1,10 +1,29 @@
-__SEPA Rainfall API ELT__
+**SEPA Rainfall API ELT**
+
 ---
 
-Pipeline pulling the daily and monthly rainfall data from 300 monitoring stations via a SEPA API.  
+In this project we extract data from a rainfall API. The API contains data on >250 stations from across Scotland. 
 
-__Files:__
-1. SEPA_API_ETL.py - Python file for the ETL process.
-2. SEPA_daily_rainfall_data.csv - output file - 12 months data to 30/05/21.
-3. SEPA_monthly_rainfall_data.csv - output file - figures from at furthest 2011 on, some stations were not providing data for the full duration.
-4. SEPA_station_info.csv - output file - API data for each station including name, id and lat / long co-ordinates. 
+The scope of the project is to: 
+- automatically extract data from the API over the required time period.
+- clean and process this data into a usable format. 
+- build an analytics front end to allow users to interact with and gain insights the data.
+
+**Languages:** Python, YAML
+**Tools:** Streamlit, Pandas, GitHub Actions
+
+This data engineering project consists of two main parts:
+
+- **Back End** - automated API extraction using Python & GitHub Actions
+    The SEPA_pipeline.py and the API_Extract.yml files are configured so as data/SEPA_Monthly.csv is updated once per month. 
+
+    The souce of the update is the [SEPA Rainfall API](https://www2.sepa.org.uk/rainfall/DataDownload) which provides daily data for >250 measuring locations across Scotland. 
+
+    The reason for this structure is simple - a colleague needed this csv file in this structure for their own process - and I wanted to have this process fully automated on my part. 
+
+- **Front End** - Data analytics app using Python(Streamlit / Pandas)
+    There is a [streamlit app](https://share.streamlit.io/scidelta/api-etl-sepa-rainfall/main/RainApp.py) attached to the backend dataset.The app maps all the stations and allows users to filter by station and by date. 
+
+    The app provides insight into graphical trends and statistical summary.
+
+    The app was featured in a streamlit weekly roundup in Jan-2022.
