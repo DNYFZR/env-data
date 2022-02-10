@@ -1,7 +1,7 @@
 name: API_Extract
 on:
   schedule:
-    - cron: "0 12 10 * *"
+    - cron: "15 0 10 * *"
 
 jobs:
   build:
