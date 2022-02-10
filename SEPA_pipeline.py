@@ -63,6 +63,6 @@ if __name__ == '__main__':
     table_url = 'https://apps.sepa.org.uk/rainfall/api/Stations'
     monthly_url = 'https://apps.sepa.org.uk/rainfall/api/Month/{}?all=true'
     
-    sepa_api_extract(table_url, monthly_url)
-
+    data = sepa_api_extract(table_url, monthly_url)
+    data.to_csv(r'data/SEPA_Monthly.csv')
     
