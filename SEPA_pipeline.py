@@ -57,7 +57,7 @@ def sepa_api_extract(table_url, base_url):
         df_data['latitude'] = df_data['station_number'].map(latitude)
         df_data['longitude'] = df_data['station_number'].map(longitude)
         
-        return df_data
+        return df_data.reset_index(drop = True)
 
 if __name__ == '__main__':    
     table_url = 'https://apps.sepa.org.uk/rainfall/api/Stations'
