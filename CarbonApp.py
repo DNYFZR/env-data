@@ -176,5 +176,3 @@ st.download_button(
     data=convert_df(df), 
     file_name='raw_data.csv', 
     mime='text/csv') 
-
-st.markdown('Contact: [@sciDelta](https://twitter.com/sciDelta)')
