@@ -1,11 +1,11 @@
-**SEPA Rainfall API ELT**
+**SEPA Rainfall API ETL**
 
 ---
 
-In this data engineering project we will: 
-- develop a pipeline to extract monthly data from a rainfall API - with >250 station going back over 10 years. 
-- implement an automated workflow to deploy our pipeline and maintain our dataset. 
-- We will then build a data analytics app on top of the maintained dataset. 
+| **Pipeline status**
+|--
+|[![API_Extract](https://github.com/sciDelta/API-ETL-SEPA-rainfall/actions/workflows/API_Extract.yml/badge.svg)](https://github.com/sciDelta/API-ETL-SEPA-rainfall/actions/workflows/API_Extract.yml)
+
 
 **Languages:** Python 3.9.10, YAML
 
