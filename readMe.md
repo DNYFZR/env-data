@@ -23,7 +23,7 @@ This project consists of two main parts:
 
 - **Front End** - Data analytics app using Python(Streamlit / Pandas)
 
-    There is a [streamlit app](https://share.streamlit.io/scidelta/api-etl-sepa-rainfall/main/RainApp.py) attached to the backend dataset.The app maps all the stations and allows users to filter by station and by date. 
+    There is a [streamlit app](https://share.streamlit.io/idataengineer/dataeng-rainfallapp/main/RainApp.py) attached to the backend dataset.The app maps all the stations and allows users to filter by station and by date. 
 
     The app provides insight into graphical trends and statistical summary.
 
