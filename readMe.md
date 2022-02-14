@@ -28,9 +28,9 @@ The pipeline has been deployed using Github actions, and two analytical solution
 
 **Front End...Part 2** - Data analytics using power BI
     
-= In the repo there is a powerBI folder, within which there is a power BI desktop file that is connected to SEPA_Monthly.csv.
+- In the repo there is a powerBI folder, within which there is a power BI desktop file that is connected to SEPA_Monthly.csv.
     
-= At the last update this front end is similar to what has been deployed to the streamlit app.
+- At the last update this front end is similar to what has been deployed to the streamlit app.
 
 ---
 
