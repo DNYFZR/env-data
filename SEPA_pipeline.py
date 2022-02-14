@@ -1,6 +1,18 @@
 ''' SEPA Rainfall API ETL '''
 import requests, pandas as pd
 
+'''
+Function: sepa_api_extract(table_url, base_url)
+
+    - table_url: URL for SEPA rainfall API station info table
+
+    - base_url: URL for SEPA rainfall API dataset (monthly in this case)
+
+Output: Dataframe containing columns[Timestamp, Rainfall (mm), Station name, Station number, Latitude, Longitude]
+
+Note: This pipeline is automated using GitHub actions - see API_Extract.yml for details
+'''
+
 # API ETL function
 def sepa_api_extract(table_url, base_url):    
     # API check
