@@ -1,3 +1,5 @@
+---
+
 #### Carbon App
 
 ---
@@ -14,6 +16,8 @@ The streamlit app can be accessed here: [Carbon App](https://share.streamlit.io/
 
 **Languages / Tools** 
 
+---
+
 - Python 3.9.10
 - Requests 2.25.1
 - Numpy 1.19.5 
@@ -25,6 +29,8 @@ The streamlit app can be accessed here: [Carbon App](https://share.streamlit.io/
 ---
 
 **Scripts**
+
+--- 
 
 DataPipeline.py
 - Takes the selected date range as an input.
