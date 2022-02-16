@@ -1,5 +1,7 @@
 #### Carbon Intensity API Pipeline ####
 import requests, pandas as pd, datetime as dt
+
+# Wrapper function for API extract
 def get_api_data(start_date, end_date):
     if type(start_date) == str:
         start_date = pd.to_datetime(start_date)
@@ -12,6 +14,7 @@ def get_api_data(start_date, end_date):
     df_mix = pd.DataFrame()
     date_list = list()
 
+    # Create list of dates for URL
     if start_date == end_date:
         date_list.append( (str(start_date), str(end_date + dt.timedelta(days = 1)) ) )
     else:
