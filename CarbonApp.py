@@ -113,7 +113,7 @@ df_app.iloc[:, 1:] = round(df_app.iloc[:, 1:], 1)
 
 with st.expander('Show Data Tables'):
     st.markdown('Stats Table')
-    st.dataframe(df.describe())
+    st.dataframe(df_time.describe())
 
     st.markdown('---\n\nMean Table')
     st.dataframe(df_app)
