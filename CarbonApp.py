@@ -4,22 +4,22 @@ import matplotlib.pyplot as plt, matplotlib.dates as mdates, seaborn as sns
 from DataPipeline import get_api_data
 sns.set()
 
-st.title('♻ Carbon Intensity App ♻')
-st.markdown('**This app can show forecasts for up to 2 days ahead as well as historic data**')
-st.markdown('If a long time period is selected the app may take some time to complete the API query.')
-
-today = datetime.datetime.today()
+### Set Up ###
 
 # Download data converter
 @st.cache
 def convert_df(df):
     return df.to_csv().encode('utf-8')
 
-# Select dates
-col1, col2 = st.columns(2)
+today = datetime.datetime.today()
+today_str = datetime.datetime.strftime(today, '%d-%b-%Y')
 
-start = col1.date_input(label='Start Date', value = today)
-end = col2.date_input(label='End Date', value = today)
+# Sidebar Dates
+st.sidebar.subheader('🎮 App Controls 🎮')
+st.sidebar.text(f'Current Date: {today_str}')
+
+start = st.sidebar.date_input(label='Start Date', value = today)
+end = st.sidebar.date_input(label='End Date', value = today)
 
 # API data extract
 @st.cache(allow_output_mutation=True)
@@ -33,21 +33,37 @@ df['end date'] = pd.to_datetime(df['end date'])
 df['renewables'] = df['biomass'] + df['wind'] + df['hydro'] + df['solar']
 df['fossil fuels'] = df['coal'] + df['gas']
 df['unknown'] = df['other'] + df['imports']
+df['total'] = df['renewables'] + df['nuclear'] + df['fossil fuels'] + df['unknown']
 
-# Time Series Charts / Table
+
+### App Build ###
+st.title('♻ Carbon Intensity App ♻')
+
+st.markdown('**This app can show forecasts for up to 2 days ahead as well as historic data**')
+st.markdown('If a long time period is selected the app may take some time to complete the API query.')
+
+# Sidebar - Nation / DNO filter
 names = df['shortname'].unique()
-sel_box = st.selectbox(label='Select Area', options=names, index = 17)
+sel_box = st.sidebar.selectbox(label='Select Area', options=names, index = 17)
 
+### Filter & Plot Timeseries ###
+
+# set up cols for intensity & energy mix charts
+col1, col2 = st.columns(2)
+
+# Apply data filters
 df_time = df[df['shortname'] == sel_box].copy().reset_index(drop = True)
 
-# Plot charts
+# Start & End for axis
 started = df_time['start date'].min().strftime('%d-%b')
 ended = df_time['start date'].max().strftime('%d-%b')
 
-fig_intensity = plt.figure(figsize=(10,6))
+# Plot carbon intensity timeseries
+fig_intensity = plt.figure(figsize=(10,10))
 
 plt.plot(df_time['start date'], df_time['intensity'])
 
+# Change x-axis to HH:MM if looking at single day
 if start == end:
     plt.title(f'{sel_box} Carbon Intensity \n{started}', size = 14)
     dtFmt = mdates.DateFormatter('%H:%M') 
@@ -59,9 +75,12 @@ plt.ylabel('kg CO2 / kWh Equiv.')
 plt.tight_layout()
 plt.gca().xaxis.set_major_formatter(dtFmt) # apply the format to the desired axis
 
-st.pyplot(fig_intensity)
+# plot in first column
+with col1:
+    st.pyplot(fig_intensity)
 
-fig_energy = plt.figure(figsize=(10,6))
+# Plot energy mix time series
+fig_energy = plt.figure(figsize=(10,10))
 
 plt.plot(df_time['start date'], df_time['fossil fuels'])
 plt.plot(df_time['start date'], df_time['nuclear'])
@@ -81,98 +100,87 @@ else:
 plt.tight_layout()
 plt.gca().xaxis.set_major_formatter(dtFmt) # apply the format to the desired axis
 
-st.pyplot(fig_energy)
-
-st.download_button(
-    label="Download Chart Data", 
-    data=convert_df(df_time), 
-    file_name='time_data.csv', 
-    mime='text/csv') 
+with col2:
+    st.pyplot(fig_energy)
 
 
-# Summary data
-st.subheader('Average For Selected Time Period')
-@st.cache(allow_output_mutation=True)
-def chart_data(dataframe):
-    # Average for each DNO
-    dno_list = [i for i in dataframe['shortname'].unique()]
-    cols = ['intensity', 'biomass', 'coal', 'imports', 'gas', 'nuclear', 'other', 'hydro', 'solar', 'wind']
-    df_out = pd.DataFrame(index = range(len(dno_list)), data = dno_list, columns=['DNO Name'])
+# Summary data table
+df_chart = df[['shortname', 'intensity', 'renewables', 'nuclear', 'fossil fuels', 'unknown', 'total']].groupby(by = 'shortname').mean().sort_values(by='renewables', ascending=False)
+df_peak = df[['shortname', 'intensity', 'renewables', 'nuclear', 'fossil fuels', 'unknown', 'total']].groupby(by = 'shortname').max().sort_values(by='renewables', ascending=False)
 
-    for c in cols:
-        new_col = {}
-        temp_df = dataframe[['shortname', c]]
-        for n, i in enumerate(dno_list):
-            temp_val = temp_df[temp_df['shortname'] == i][c].mean()
-            new_col.update({n: temp_val})
-        df_out[c] = df_out.index.map(new_col)
-
-    total_col = {}
-    for i in df_out.index:
-        temp_val = df_out.iloc[i, :]
-        temp_val = sum(temp_val[-len(cols):]) - df_out.loc[i, 'intensity']
-        total_col.update({i: temp_val})
-
-    df_out['total'] = df_out.index.map(total_col)
-
-    df_out['renewables'] = df_out['biomass'] + df_out['wind'] + df_out['hydro'] + df_out['solar']
-    df_out['fossil fuels'] = df_out['coal'] + df_out['gas']
-    df_out['unknown'] = df_out['other'] + df_out['imports']
-
-    return df_out
-
-df_chart = chart_data(df.copy())
 df_app = df_chart.copy()
 df_app.iloc[:, 1:] = round(df_app.iloc[:, 1:], 1)
-df_app
 
-st.download_button(
-    label="Download Summary Data", 
-    data=convert_df(df_chart), 
-    file_name='chart_data.csv', 
-    mime='text/csv') 
+with st.expander('Show Data Tables'):
+    st.markdown('Stats Table')
+    st.dataframe(df.describe())
 
-st.markdown('''
-    In the above table the data is in kg/kWh for intensity and the rest are percentages. \n
-    The columns after total are summations of individual % contributions. \n
+    st.markdown('---\n\nMean Table')
+    st.dataframe(df_app)
+
+    st.markdown('---\n\nMax Table')
+    st.dataframe(df_peak)
+
+    st.markdown('''
+    In the above tables the data is in kg/kWh for intensity and the rest are percentages. \n
     ''')
 
-# Pies 
-df_pies = df_chart[['DNO Name', 'fossil fuels', 'nuclear', 'renewables', 'unknown']].copy().set_index('DNO Name', drop=True)
-
+# Energy mix pies
+df_pies = df_app.copy()
 
 id_list = [i for i in df['shortname'].copy().unique()]
 n_rows = 6
 n_cols = 3
 
-pie_fig, ax = plt.subplots(nrows = n_rows, ncols = n_cols, figsize = (14, 28))
+pie_fig, ax = plt.subplots(nrows = n_rows, ncols = n_cols, figsize = (12, 12))
 for row in range(n_rows):
     for col in range(n_cols):
         i = id_list[0]
 
         ax[row, col].pie(
             x = df_pies.loc[i, ['fossil fuels', 'nuclear', 'renewables', 'unknown']],
-            autopct = '%.0f%%', textprops={'fontsize': 14, 'color': 'black'}, pctdistance = 1.15)
+            autopct = '%.0f%%', textprops={'fontsize': 8, 'color': 'black'}, pctdistance = 1.2)
         if i == 'GB':
-            ax[row, col].set_title(i, fontsize = 16)
+            ax[row, col].set_title(i, fontsize = 10)
         else:
-            ax[row, col].set_title(i.title(), fontsize = 16)
+            ax[row, col].set_title(i.title(), fontsize = 10)
 
         # Remove used ID & column from list
         id_list.pop(0)
 
 pie_fig.legend(['Fossil', 'Nuclear', 'Renewable', 'Imports'], 
             loc = 'lower center', facecolor = 'gainsboro', 
-            prop={'size': 14}, ncol = 4, frameon = False,
+            prop={'size': 10}, ncol = 4, frameon = False,
             bbox_to_anchor=(0.5, 0.075))
 
 plt.rcParams['figure.facecolor'] = 'gainsboro'
-plt.suptitle('Generation Mix By Area', y = 0.93, fontsize = 18, fontweight = 'semibold')
+plt.suptitle('Generation Mix By Area', y = 0.93, fontsize = 12, fontweight = 'semibold')
 
 st.pyplot(pie_fig)
 
-st.download_button(
-    label="Download Raw Data", 
+### Download buttons
+st.sidebar.subheader('Download Datasets...')
+
+st.sidebar.download_button(
+    label="Download Time Series (raw)", 
+    data=convert_df(df_time), 
+    file_name='time_data.csv', 
+    mime='text/csv') 
+
+st.sidebar.download_button(
+    label="Download Time Series (mean)", 
+    data=convert_df(df_chart), 
+    file_name='chart_data.csv', 
+    mime='text/csv') 
+
+st.sidebar.download_button(
+    label="Download Time Series (max)", 
+    data=convert_df(df_peak), 
+    file_name='chart_data.csv', 
+    mime='text/csv') 
+
+st.sidebar.download_button(
+    label="Download Raw Dataset", 
     data=convert_df(df), 
     file_name='raw_data.csv', 
     mime='text/csv') 
