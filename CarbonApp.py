@@ -132,7 +132,7 @@ id_list = [i for i in df['shortname'].copy().unique()]
 n_rows = 6
 n_cols = 3
 
-pie_fig, ax = plt.subplots(nrows = n_rows, ncols = n_cols, figsize = (12, 12))
+pie_fig, ax = plt.subplots(nrows = n_rows, ncols = n_cols, figsize = (12, 14))
 for row in range(n_rows):
     for col in range(n_cols):
         i = id_list[0]
