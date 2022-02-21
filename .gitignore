@@ -1,3 +1,4 @@
 
 *.pyc
 __pycache__/DataPipeline.cpython-39.pyc
+*.pyc
