@@ -80,4 +80,4 @@ def get_api_data(start_date, end_date):
 
 if __name__ == '__main__':
     df = get_api_data(dt.date(2022,1,1), dt.date(2022,1,1))
-    print(df.head())
+    df.to_csv(r'data/CarbonData.csv')
