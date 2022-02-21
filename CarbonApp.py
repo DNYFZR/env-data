@@ -139,7 +139,7 @@ for row in range(n_rows):
 
         ax[row, col].pie(
             x = df_pies.loc[i, ['fossil fuels', 'nuclear', 'renewables', 'unknown']],
-            autopct = '%.0f%%', textprops={'fontsize': 8, 'color': 'black'}, pctdistance = 1.2)
+            autopct = '%.0f%%', textprops={'fontsize': 8, 'color': 'black'}, pctdistance = 1.25)
         if i == 'GB':
             ax[row, col].set_title(i, fontsize = 10)
         else:
