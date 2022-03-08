@@ -1,7 +1,7 @@
 name: API_Extract
 on:
   schedule: # 7am on the first of the month
-    - cron: "12 12 8 * *"
+    - cron: "15 12 8 * *"
 
 jobs:
   build:
