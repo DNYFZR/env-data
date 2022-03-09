@@ -77,7 +77,7 @@ if __name__ == '__main__':
     monthly_url = 'https://www2.sepa.org.uk/rainfall/api/Hourly/{}?all=true'
     
     data = sepa_api_extract(table_url, monthly_url)
-        
+
     # Check most recent timestamp in database
     database = pd.read_csv(r'data/SEPA_Monthly.csv', index_col=0, parse_dates=['Timestamp'])
     last_entry_date = database['Timestamp'].max()
