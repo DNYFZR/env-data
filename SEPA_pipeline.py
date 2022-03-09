@@ -72,8 +72,8 @@ def sepa_api_extract(table_url, base_url):
         return df_data.reset_index(drop = True)
 
 if __name__ == '__main__':    
-    table_url = 'https://apps.sepa.org.uk/rainfall/api/Stations'
-    monthly_url = 'https://apps.sepa.org.uk/rainfall/api/Month/{}?all=true'
+    table_url = 'https://www2.sepa.org.uk/rainfall/api/Stations'
+    monthly_url = 'https://www2.sepa.org.uk/rainfall/api/Hourly/{}?all=true'
     
     data = sepa_api_extract(table_url, monthly_url)
     data.to_csv(r'data/SEPA_Monthly.csv')
