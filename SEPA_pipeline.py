@@ -72,9 +72,15 @@ def sepa_api_extract(table_url, base_url):
         return df_data.reset_index(drop = True)
 
 if __name__ == '__main__':    
+    # Extract API data
     table_url = 'https://www2.sepa.org.uk/rainfall/api/Stations'
     monthly_url = 'https://www2.sepa.org.uk/rainfall/api/Hourly/{}?all=true'
     
     data = sepa_api_extract(table_url, monthly_url)
-    data.to_csv(r'data/SEPA_Monthly.csv')
-    
+        
+    # Check most recent timestamp in database
+    database = pd.read_csv(r'data/SEPA_Monthly.csv', index_col=0, parse_dates=['Timestamp'])
+    last_entry_date = database['Timestamp'].max()
+
+    # Copy new data to database - filter for entries more recent than last db update.
+    data[data['Timestamp'] > last_entry_date].copy().to_csv(r'data/SEPA_Monthly.csv', mode='a', header=False)
