@@ -74,7 +74,7 @@ def sepa_api_extract(table_url, base_url):
 if __name__ == '__main__':    
     # Extract API data
     table_url = 'https://www2.sepa.org.uk/rainfall/api/Stations'
-    monthly_url = 'https://www2.sepa.org.uk/rainfall/api/Hourly/{}?all=true'
+    monthly_url = 'https://www2.sepa.org.uk/rainfall/api/Month/{}?all=true'
     
     data = sepa_api_extract(table_url, monthly_url)
 
