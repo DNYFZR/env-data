@@ -1,86 +1,85 @@
 ''' SEPA Rainfall API ETL '''
+
 import requests, pandas as pd
 
-'''
-Function: sepa_api_extract(table_url, base_url)
+###################################################################################
 
-    - table_url: URL for SEPA rainfall API station info table
+def station_data(table_url):
+    ''' Function takes in the SEPA rainfall API station table URL and checks if the API is returning a 200 status code. 
+        
+        If not, the function prints error statement with current status code. 
+        
+        Else, creates a dataframe with the metadata, and returns the table with the station name, number, latitude & longitude.
 
-    - base_url: URL for SEPA rainfall API dataset (monthly in this case)
-
-Output: Dataframe containing columns[Timestamp, Rainfall (mm), Station name, Station number, Latitude, Longitude]
-
-Note: This pipeline is automated using GitHub actions - see API_Extract.yml for details
-'''
-
-# API ETL function
-def sepa_api_extract(table_url, base_url):    
-    # API check
-    api_status = requests.get(table_url).status_code
-    
-    if api_status != 200:
-        pass
-
+        The table is utilised by the monthly_data() function to extract data from the API and then tag it to the correct site.   
+    '''
+    api_test = requests.get(table_url).status_code
+    if api_test != 200:
+        print(f'API error {api_test}')
     else:
-        # Station data 
-        res = requests.get(table_url)
-        df_table = pd.DataFrame(res.json())
-        df_table = df_table[['station_name', 'station_no', 'station_latitude', 'station_longitude']]
-
-        # Transform
-        df_table['station_no'] = df_table['station_no'].astype(int)
-        df_table['station_latitude'] = df_table['station_latitude'].astype(float)
-        df_table['station_longitude'] = df_table['station_longitude'].astype(float)
-
-        # Identifiers for API extracts
-        id_list = [i for i in df_table['station_no']]
-
-        # Data extract
-        df_data = pd.DataFrame()
-        for i in id_list:
-            api = base_url.format(i)
-            res = requests.get(api).json()
-            add_col = pd.DataFrame(res, columns = ['Timestamp', 'Value'])
-            add_col['station_number'] = i
-            df_data = pd.concat([df_data, add_col], axis = 0)
-
-        df_data['Value'] = df_data['Value'].astype(float)
-        df_data['Value'] = [0.0 if pd.isna(i) or i == '' else i for i in df_data['Value']]
-        df_data = df_data.rename(columns = {'Value': 'Rainfall (mm)'})
-        df_data['Timestamp'] = pd.to_datetime(df_data['Timestamp'])
-
-        # Combine data 
-        station_name = {}
-        station_no = {}
-        latitude = {}
-        longitude = {}
-        for i in df_data['station_number'].unique():
-            if i not in station_name.keys():
-                station_name.update({i: df_table[df_table['station_no'] == i].reset_index().loc[0, 'station_name']})
-            if i not in station_no.keys():
-                station_no.update({i: df_table[df_table['station_no'] == i].reset_index().loc[0, 'station_no']})
-            if i not in latitude.keys():
-                latitude.update({i: df_table[df_table['station_no'] == i].reset_index().loc[0, 'station_latitude']})
-            if i not in longitude.keys():
-                longitude.update({i: df_table[df_table['station_no'] == i].reset_index().loc[0, 'station_longitude']})
+        station_data = pd.DataFrame(requests.get(table_url).json())
         
-        df_data['station_name'] = df_data['station_number'].map(station_name)
-        df_data['station_no'] = df_data['station_number'].map(station_no)
-        df_data['latitude'] = df_data['station_number'].map(latitude)
-        df_data['longitude'] = df_data['station_number'].map(longitude)
+        for col in station_data.columns:
+            if col not in ['station_name', 'station_latitude', 'station_longitude', 'station_no']:
+                del station_data[col]
         
-        return df_data.reset_index(drop = True)
+        station_data['station_latitude'] = station_data['station_latitude'].astype(float)
+        station_data['station_longitude'] = station_data['station_longitude'].astype(float)
+        station_data['station_no'] = station_data['station_no'].astype(int)
+        return station_data
 
-if __name__ == '__main__':    
+##############################################################################################
+
+def monthly_data(monthly_url, table_url):
+    ''' Function takes in the URLs for the API data feed (monthly_url) & the metadata (table_url). 
+        
+        It calls the station_data() function, then creates dictionaries of the station name, latitude & longitude, with the key set to the station number. 
+    '''
+
+    # Create reference dictionaries
+    temp_df = station_data(table_url).set_index('station_no', drop = True)
+    station_names = temp_df['station_name'].to_dict()
+    station_lat = temp_df['station_latitude'].to_dict()
+    station_lon = temp_df['station_longitude'].to_dict()
+
+    # ID stack
+    id_stack = [i for i in temp_df.index]
+    
+    # API call
+    combined_data = []
+    for idx in id_stack:
+        url = monthly_url.format(idx)
+        api_call = requests.get(url).json()
+
+        # Add station no (id) to dict & append to combined dataset
+        for data_dict in api_call:
+            data_dict['station_no'] = idx
+            combined_data.append(data_dict)
+
+    # map additional data to dictionaries from ref's
+    for data_dict in combined_data:
+        data_dict['station_name'] = station_names[data_dict['station_no']]
+        data_dict['station_latitude'] = station_lat[data_dict['station_no']]
+        data_dict['station_longitude'] = station_lon[data_dict['station_no']]
+
+    # create output data frame
+    combined_data = pd.DataFrame(combined_data)
+    combined_data.columns = [i.lower() for i in combined_data.columns]
+    combined_data['timestamp'] = pd.to_datetime(combined_data['timestamp'])
+    return combined_data
+
+
+if __name__ == '__main__':
     # Extract API data
     table_url = 'https://www2.sepa.org.uk/rainfall/api/Stations'
     monthly_url = 'https://www2.sepa.org.uk/rainfall/api/Month/{}?all=true'
-    
-    data = sepa_api_extract(table_url, monthly_url)
+
+    data = monthly_data(table_url=table_url, monthly_url=monthly_url)
 
     # Check most recent timestamp in database
-    database = pd.read_csv(r'data/SEPA_Monthly.csv', index_col=0, parse_dates=['Timestamp'])
-    last_entry_date = database['Timestamp'].max()
+    database = pd.read_csv(r'data/SEPA_Monthly.csv', index_col=0, parse_dates=['timestamp'])
+    last_entry_date = database['timestamp'].max()
 
     # Copy new data to database - filter for entries more recent than last db update.
-    data[data['Timestamp'] > last_entry_date].copy().to_csv(r'data/SEPA_Monthly.csv', mode='a', header=False)
+    database_updated = pd.concat([database, data[data['timestamp'] > last_entry_date]], axis = 0)
+    database_updated.to_csv(r'data/SEPA_Monthly.csv')
