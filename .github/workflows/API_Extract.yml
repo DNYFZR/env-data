@@ -23,6 +23,7 @@ jobs:
       - name: execute api script
         run: |
           python SEPA_pipeline.py
+
       - name: commit files
         run: |
           git config --local user.email "action@github.com"
