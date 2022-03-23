@@ -12,10 +12,10 @@ def convert_df(df):
 def source_data():
     url = 'https://raw.githubusercontent.com/sciDelta/API-ETL-SEPA-rainfall/main/data/SEPA_Monthly.csv'
 
-    df = pd.read_csv(url, parse_dates=['Timestamp'])
-    df['Year'] = [i.year for i in df['Timestamp']]
+    df = pd.read_csv(url, parse_dates=['timestamp'], index_col=0)
+    df['Year'] = [i.year for i in df['timestamp']]
 
-    for col in [ 'Unnamed: 0', 'station_no', 'station_number']:
+    for col in [ 'Unnamed: 0', 'station_no']:
         if col in df.columns:
             del df[col]
 
@@ -26,13 +26,13 @@ df = source_data()
 # Time series stats
 @st.cache(allow_output_mutation=True)
 def time_stats(base_data):
-    dates = base_data['Timestamp'].unique()
+    dates = base_data['timestamp'].unique()
     time_data = pd.DataFrame(index=dates, columns=['Min Rainfall','Mean Rainfall', 'Max Rainfall'])
 
     for i in time_data.index:
-        time_data.loc[i, 'Mean Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall (mm)'].mean().astype(int)
-        time_data.loc[i, 'Max Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall (mm)'].max().astype(int)
-        time_data.loc[i, 'Min Rainfall'] = base_data[base_data['Timestamp'] == i]['Rainfall (mm)'].min().astype(int)
+        time_data.loc[i, 'Mean Rainfall'] = base_data[base_data['timestamp'] == i]['value'].mean().astype(int)
+        time_data.loc[i, 'Max Rainfall'] = base_data[base_data['timestamp'] == i]['value'].max().astype(int)
+        time_data.loc[i, 'Min Rainfall'] = base_data[base_data['timestamp'] == i]['value'].min().astype(int)
     
     return time_data
 
@@ -71,16 +71,16 @@ with chart_col:
 # Data tables
 groups = map_chart.groupby(by = ['station_name'])
 
-group_min = groups['Rainfall (mm)'].min()
-group_avg = groups['Rainfall (mm)'].mean()
-group_max = groups['Rainfall (mm)'].max()
-group_len = groups['Rainfall (mm)'].count()
+group_min = groups['value'].min()
+group_avg = groups['value'].mean()
+group_max = groups['value'].max()
+group_len = groups['value'].count()
 
-group_old = groups['Timestamp'].min()
-group_new = groups['Timestamp'].max()
+group_old = groups['timestamp'].min()
+group_new = groups['timestamp'].max()
 
-group_lat = groups['latitude'].max()
-group_lon = groups['longitude'].max()
+group_lat = groups['station_latitude'].max()
+group_lon = groups['station_longitude'].max()
 
 group_summary = pd.concat([
     group_min.rename('Min (mm)'), 
