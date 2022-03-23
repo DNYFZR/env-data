@@ -64,7 +64,7 @@ map_chart = map_data.copy().drop(columns=['Year']).reset_index(drop = True)
 # Map & time series chart
 map_col, chart_col = st.columns(2)
 with map_col: 
-    st.map(map_chart)
+    st.map(map_chart.rename(columns={'station_latitude': 'latitude', 'station_longitude': 'longitude'}))
 with chart_col:
     st.line_chart(time_stats(map_chart), height = 500)
 
