@@ -21,10 +21,12 @@ st.sidebar.text(f'Current Date: {today_str}')
 start = st.sidebar.date_input(label='Start Date', value = today)
 end = st.sidebar.date_input(label='End Date', value = today)
 
+data_pipeline = carbon_data(start_date=start, end_date=end + datetime.timedelta(days=1))
+
 # API data extract
 @st.cache(allow_output_mutation=True)
 def update_data():
-    return carbon_data(start_date=start, end_date=end + datetime.timedelta(days=1)).run_pipeline()
+    return data_pipeline.run_pipeline()
 
 df = update_data()
 
