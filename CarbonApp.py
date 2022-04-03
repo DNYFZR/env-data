@@ -1,7 +1,7 @@
 #### Streamlit App - Carbon Intensity Dashboard ###
 import datetime, pandas as pd, streamlit as st
 import matplotlib.pyplot as plt, matplotlib.dates as mdates, seaborn as sns
-from DataPipeline import get_api_data
+from DataPipeline_v4 import carbon_data
 sns.set()
 
 ### Set Up ###
@@ -24,7 +24,7 @@ end = st.sidebar.date_input(label='End Date', value = today)
 # API data extract
 @st.cache(allow_output_mutation=True)
 def update_data():
-    return get_api_data(start_date=start, end_date=end + datetime.timedelta(days=1))
+    return carbon_data(start_date=start, end_date=end + datetime.timedelta(days=1)).run_pipeline()
 
 df = update_data()
 
