@@ -28,12 +28,14 @@ def update_data():
 
 df = update_data()
 
-df['start date'] = pd.to_datetime(df['start date'])
-df['end date'] = pd.to_datetime(df['end date'])
-df['renewables'] = df['biomass'] + df['wind'] + df['hydro'] + df['solar']
-df['fossil fuels'] = df['coal'] + df['gas']
-df['unknown'] = df['other'] + df['imports']
-df['total'] = df['renewables'] + df['nuclear'] + df['fossil fuels'] + df['unknown']
+df.columns = df.columns.str.lower()
+
+df['start'] = pd.to_datetime(df['start'])
+df['end'] = pd.to_datetime(df['end'])
+df['renewables %'] = df['biomass %'] + df['wind %'] + df['hydro %'] + df['solar %']
+df['fossil fuels %'] = df['coal %'] + df['gas %']
+df['unknown %'] = df['other %'] + df['imports %']
+df['total %'] = df['renewables %'] + df['nuclear %'] + df['fossil fuels %'] + df['unknown %']
 
 
 ### App Build ###
@@ -43,7 +45,7 @@ st.markdown('**This app can show forecasts for up to 2 days ahead as well as his
 st.markdown('If a long time period is selected the app may take some time to complete the API query.')
 
 # Sidebar - Nation / DNO filter
-names = df['shortname'].unique()
+names = df['name'].unique()
 sel_box = st.sidebar.selectbox(label='Select Area', options=names, index = 17)
 
 ### Filter & Plot Timeseries ###
@@ -52,16 +54,16 @@ sel_box = st.sidebar.selectbox(label='Select Area', options=names, index = 17)
 col1, col2 = st.columns(2)
 
 # Apply data filters
-df_time = df[df['shortname'] == sel_box].copy().reset_index(drop = True)
+df_time = df[df['name'] == sel_box].copy().reset_index(drop = True)
 
 # Start & End for axis
-started = df_time['start date'].min().strftime('%d-%b')
-ended = df_time['start date'].max().strftime('%d-%b')
+started = df_time['start'].min().strftime('%d-%b')
+ended = df_time['start'].max().strftime('%d-%b')
 
 # Plot carbon intensity timeseries
 fig_intensity = plt.figure(figsize=(10,10))
 
-plt.plot(df_time['start date'], df_time['intensity'])
+plt.plot(df_time['start'], df_time['intensity'])
 
 # Change x-axis to HH:MM if looking at single day
 if start == end:
@@ -82,9 +84,9 @@ with col1:
 # Plot energy mix time series
 fig_energy = plt.figure(figsize=(10,10))
 
-plt.plot(df_time['start date'], df_time['fossil fuels'])
-plt.plot(df_time['start date'], df_time['nuclear'])
-plt.plot(df_time['start date'], df_time['renewables'])
+plt.plot(df_time['start'], df_time['fossil fuels %'])
+plt.plot(df_time['start'], df_time['nuclear %'])
+plt.plot(df_time['start'], df_time['renewables %'])
 
 plt.ylabel('Generation %')
 plt.ylim(0,100)
@@ -105,8 +107,11 @@ with col2:
 
 
 # Summary data table
-df_chart = df[['shortname', 'intensity', 'renewables', 'nuclear', 'fossil fuels', 'unknown', 'total']].groupby(by = 'shortname').mean().sort_values(by='renewables', ascending=False)
-df_peak = df[['shortname', 'intensity', 'renewables', 'nuclear', 'fossil fuels', 'unknown', 'total']].groupby(by = 'shortname').max().sort_values(by='renewables', ascending=False)
+df_chart = df[['name', 'intensity', 'renewables %', 'nuclear %', 'fossil fuels %', 'unknown %', 'total %']]
+df_chart = df_chart.groupby(by = 'name').mean().sort_values(by='renewables %', ascending=False)
+
+df_peak = df[['name', 'intensity', 'renewables %', 'nuclear %', 'fossil fuels %', 'unknown %', 'total %']]
+df_peak = df_peak.groupby(by = 'name').max().sort_values(by='renewables %', ascending=False)
 
 df_app = df_chart.copy()
 df_app.iloc[:, 1:] = round(df_app.iloc[:, 1:], 1)
@@ -128,7 +133,7 @@ with st.expander('Show Data Tables'):
 # Energy mix pies
 df_pies = df_app.copy()
 
-id_list = [i for i in df['shortname'].copy().unique()]
+id_list = [i for i in df['name'].copy().unique()]
 n_rows = 6
 n_cols = 3
 
@@ -138,7 +143,7 @@ for row in range(n_rows):
         i = id_list[0]
 
         ax[row, col].pie(
-            x = df_pies.loc[i, ['fossil fuels', 'nuclear', 'renewables', 'unknown']],
+            x = df_pies.loc[i, ['fossil fuels %', 'nuclear %', 'renewables %', 'unknown %']],
             autopct = '%.0f%%', textprops={'fontsize': 8, 'color': 'black'}, pctdistance = 1.225)
         if i == 'GB':
             ax[row, col].set_title(i, fontsize = 10)
