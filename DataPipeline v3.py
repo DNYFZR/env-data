@@ -1,5 +1,8 @@
 ### Carbon Intensity API Data Pipeline ###
 import requests, pandas as pd, datetime as dt
+from time import time
+run_start = time()
+
 
 def extract_data( start_date = dt.date(2022,1,1), end_date = dt.date(2022,4,1) ):
     '''
@@ -131,9 +134,6 @@ def transform_energy():
     return table
 
 if __name__ == '__main__':
-    from time import time
-    run_start = time()
-
     test = transform_energy()
 
     print(f'Run time: {round(time() - run_start, 1)}s')
