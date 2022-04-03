@@ -79,5 +79,9 @@ def get_api_data(start_date, end_date):
     return df_mix
 
 if __name__ == '__main__':
-    df = get_api_data(dt.date(2022,1,1), dt.date(2022,1,1))
-    df.to_csv(r'data/CarbonData.csv')
+    from time import time
+    run_start = time()
+    
+    df = get_api_data(dt.date(2022,1,1), dt.date(2022,4,1))
+    
+    print(f'Run time: {round(time() - run_start, 1)}s')
