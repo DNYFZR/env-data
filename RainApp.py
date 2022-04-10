@@ -2,6 +2,12 @@
 import pandas as pd, streamlit as st
 ### Functions ###
 
+# Wide Mode 
+def auto_wide_mode():
+    st.set_page_config(layout="wide")
+
+auto_wide_mode()
+
 # Download converter
 @st.cache
 def convert_df(df):
