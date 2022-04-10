@@ -6,6 +6,12 @@ sns.set()
 
 ### Set Up ###
 
+# Wide Mode 
+def auto_wide_mode():
+    st.set_page_config(layout="wide")
+
+auto_wide_mode()
+
 # Download data converter
 @st.cache
 def convert_df(df):
