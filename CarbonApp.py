@@ -1,7 +1,7 @@
 #### Streamlit App - Carbon Intensity Dashboard ###
 import datetime, pandas as pd, streamlit as st
 import matplotlib.pyplot as plt, matplotlib.dates as mdates, seaborn as sns
-from DataPipeline_v4 import carbon_data
+from DataPipeline import carbon_data
 sns.set()
 
 ### Set Up ###
