@@ -1,21 +1,25 @@
 ''' Rainfall API ETL '''
-import requests, pandas as pd
+import requests, pandas as pd, datetime as dt 
 
 # API ETL function
 def station_data(table_url):
     api_test = requests.get(table_url).status_code
+    
     if api_test != 200:
         print(f'API error {api_test}')
+        return pd.DataFrame([f'No data - {api_test}'])
+    
     else:
         station_data = pd.DataFrame(requests.get(table_url).json())
         
         for col in station_data.columns:
-            if col not in ['station_name', 'station_latitude', 'station_longitude', 'station_no']:
+            if col not in ['station_name', 'station_latitude', 'station_longitude', 'station_no', 'itemDate']:
                 del station_data[col]
         
         station_data['station_latitude'] = station_data['station_latitude'].astype(float)
         station_data['station_longitude'] = station_data['station_longitude'].astype(float)
         station_data['station_no'] = station_data['station_no'].astype(int)
+
         return station_data
 
 def data_etl(hourly_url, table_url):
@@ -53,12 +57,15 @@ def data_etl(hourly_url, table_url):
 
 
 if __name__ == '__main__':
+    import datetime as dt 
     from time import time
+    
     print(f'Run initiated')
-    # Extract API data
+
     table_url = 'https://www2.sepa.org.uk/rainfall/api/Stations'
     hourly_url = 'https://www2.sepa.org.uk/rainfall/api/Hourly/{}?today'
 
     start = time()    
     data = data_etl(table_url=table_url, hourly_url=hourly_url)
+    
     print(data.head(), f'\nComplete in: {round(time() - start, 1)}s')
