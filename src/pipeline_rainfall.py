@@ -1,6 +1,10 @@
 ''' Rainfall API ETL '''
 import requests, pandas as pd, datetime as dt 
 
+class rainfall_data:
+    def __init__(self) -> None:
+        pass
+
 # API ETL function
 def station_data(table_url):
     api_test = requests.get(table_url).status_code
