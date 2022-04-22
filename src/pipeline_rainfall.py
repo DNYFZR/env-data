@@ -68,8 +68,18 @@ if __name__ == '__main__':
 
     table_url = 'https://www2.sepa.org.uk/rainfall/api/Stations'
     hourly_url = 'https://www2.sepa.org.uk/rainfall/api/Hourly/{}?today'
+    monthly_url = 'https://www2.sepa.org.uk/rainfall/api/Month/{}?all=true'
 
     start = time()    
     data = data_etl(table_url=table_url, hourly_url=hourly_url)
     
     print(data.head(), f'\nComplete in: {round(time() - start, 1)}s')
+
+    
+    # Check most recent timestamp in database
+    database = pd.read_csv(r'data/RainfallData/SEPA_Monthly.csv', index_col=0, parse_dates=['timestamp'])
+    last_entry_date = database['timestamp'].max()
+
+    # Copy new data to database - filter for entries more recent than last db update.
+    database_updated = pd.concat([database, data[data['timestamp'] > last_entry_date]], axis = 0).sort_values(by='timestamp').reset_index(drop=True)
+    database_updated.to_csv(r'data/SEPA_Monthly.csv')
