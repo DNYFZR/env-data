@@ -1,4 +1,3 @@
-### Carbon Intensity API Data Pipeline ###
 import requests, pandas as pd, datetime as dt
 
 class carbon_data:
