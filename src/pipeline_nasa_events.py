@@ -1,5 +1,5 @@
 ''' NASA Earth Observatory Natural Event API Pipeline '''
-import requests, datetime as dt, pandas as pd
+import requests, pandas as pd
 
 def earth_event_pipeline(api_url = 'https://eonet.gsfc.nasa.gov/api/v3/events'):
     '''
@@ -45,10 +45,7 @@ def earth_event_pipeline(api_url = 'https://eonet.gsfc.nasa.gov/api/v3/events'):
         # delete holding key in JSON
         del i['geometry']
 
-    return dataset
+    return pd.DataFrame(dataset)
 
 if __name__ == '__main__':
-    today = dt.datetime.strftime(dt.datetime.today(), '%Y-%b-%d')
-
-    data = pd.DataFrame(earth_event_pipeline())
-    data.to_csv(r'data/current_events_{}.csv'.format(today))
+    data = earth_event_pipeline()
