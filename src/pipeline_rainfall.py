@@ -1,12 +1,18 @@
 ''' Rainfall API ETL '''
 import requests, pandas as pd, datetime as dt 
 
-class rainfall_data:
-    def __init__(self) -> None:
-        pass
+###################################################################################
 
-# API ETL function
 def station_data(table_url):
+    ''' Function takes in the SEPA rainfall API station table URL and checks if the API is returning a 200 status code. 
+        
+        If not, the function prints error statement with current status code. 
+        
+        Else, creates a dataframe with the metadata, and returns the table with the station name, number, latitude & longitude.
+
+        The table is utilised by the monthly_data() function to extract data from the API and then tag it to the correct site.   
+    '''
+
     api_test = requests.get(table_url).status_code
     
     if api_test != 200:
@@ -26,7 +32,14 @@ def station_data(table_url):
 
         return station_data
 
+###################################################################################
+
 def data_etl(hourly_url, table_url):
+    ''' Function takes in the URLs for the API data feed (monthly_url) & the metadata (table_url). 
+        
+        It calls the station_data() function, then creates dictionaries of the station name, latitude & longitude, with the key set to the station number. 
+    '''
+
     # Create reference dictionaries
     temp_df = station_data(table_url).set_index('station_no', drop = True)
     station_names = temp_df['station_name'].to_dict()
@@ -59,6 +72,7 @@ def data_etl(hourly_url, table_url):
     combined_data['timestamp'] = pd.to_datetime(combined_data['timestamp'])
     return combined_data
 
+###################################################################################
 
 if __name__ == '__main__':
     import datetime as dt 
@@ -71,7 +85,7 @@ if __name__ == '__main__':
     monthly_url = 'https://www2.sepa.org.uk/rainfall/api/Month/{}?all=true'
 
     start = time()    
-    data = data_etl(table_url=table_url, hourly_url=hourly_url)
+    data = data_etl(table_url=table_url, hourly_url=monthly_url)
     
     print(data.head(), f'\nComplete in: {round(time() - start, 1)}s')
 
@@ -82,4 +96,4 @@ if __name__ == '__main__':
 
     # Copy new data to database - filter for entries more recent than last db update.
     database_updated = pd.concat([database, data[data['timestamp'] > last_entry_date]], axis = 0).sort_values(by='timestamp').reset_index(drop=True)
-    database_updated.to_csv(r'data/SEPA_Monthly.csv')
+    database_updated.to_csv(r'data/RainfallData/SEPA_Monthly.csv')
