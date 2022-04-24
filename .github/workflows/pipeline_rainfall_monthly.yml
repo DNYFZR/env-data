@@ -1,0 +1,38 @@
+name: pipeline_rainfall_monthly_schedule
+on:
+  schedule: # 7am on the second of the month
+    - cron: "0 7 2 * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: checkout repo content
+        uses: actions/checkout@v2 
+      
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9.10' #install python
+      
+      - name: install dependencies
+        run: |
+          pip install -r req/req_rain_pipeline.txt
+      
+      - name: execute api script
+        run: |
+          python src/pipeline_rainfall.py
+
+      - name: commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "update data" -a
+      
+      - name: push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
