@@ -91,9 +91,9 @@ if __name__ == '__main__':
 
     
     # Check most recent timestamp in database
-    database = pd.read_csv(r'C:\Users\Daniel\Documents\GitHub\Analytics-Engineering\data\RainfallData\SEPA_Monthly.csv', index_col=0, parse_dates=['timestamp'])
+    database = pd.read_csv(r'data/RainfallData/SEPA_Monthly.csv', index_col=0, parse_dates=['timestamp'])
     last_entry_date = database['timestamp'].max()
 
     # Copy new data to database - filter for entries more recent than last db update.
     database_updated = pd.concat([database, data[data['timestamp'] > last_entry_date]], axis = 0).sort_values(by='timestamp').reset_index(drop=True)
-    database_updated.to_csv(r'C:\Users\Daniel\Documents\GitHub\Analytics-Engineering\data\RainfallData\SEPA_Monthly.csv')
+    database_updated.to_csv(r'data/RainfallData/SEPA_Monthly.csv')
