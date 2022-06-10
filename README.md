@@ -1,20 +1,6 @@
-## **Analytics Engineering**
+# **Analytics Engineering Projects**
 
----
-
-#### Apr / May 2022
-
----
-
-I am currently merging a number of projects into a larger one.
-
-The readMe below will be not completely accurate while this message is still present.
-
----
-
-#### **Carbon App**
-
----
+## **Carbon App**
 
 This data / analytics engineering project extracts data from the National [Grid Carbon Intensity API](https://carbon-intensity.github.io/api-definitions/#carbon-intensity-api-v2-0-0) through a data pipeline, and then into a streamlit app.
 
@@ -42,30 +28,26 @@ st_CarbonApp.py
 
 ---
 
+## **Maintained Dataset & Analytics App**
 
-### **Data Engineering - Rainfall Pipeline & Analytics App**
+In this project I have developed a data pipeline which extracts monthly rainfall totals for >250 stations across Scotland. The pipeline has been deployed using Github actions, and an analytical front end has also been deployed.
 
----
+**Back End**
 
-In this project I have developed a data pipeline which extracts monthly rainfall totals for >250 stations across Scotland. 
+Automated API extraction pipeline developed in Python & deployed via GitHub actions
 
-The pipeline has been deployed using Github actions, and two analytical solutions have also been deployed (further details below).
+- The pipeline_rainfall.py and the pipeline_rainfall_monthly.yml files are configured so as data/RainfallData/SEPA_Monthly.csv is updated once per month.
 
-**Back End** - automated API extraction pipeline developed in Python & deployed via GitHub actions
+- Souce : [SEPA Rainfall API](https://www2.sepa.org.uk/rainfall/DataDownload)
 
-- The pipeline_rainfall.py and the pipeline_rainfall_monthly.yml files are configured so as data/RainfallData/SEPA_Monthly.csv is updated once per month. 
+**Front End**
 
-- The souce of the update is the [SEPA Rainfall API](https://www2.sepa.org.uk/rainfall/DataDownload) which provides daily data for >250 measuring locations across Scotland. 
+Cloud hosted Stremlit Data analytics app which provides insight into graphical trends and statistical summary.
 
-**Front End** - Data analytics app using Python (Streamlit / Pandas)
+**Pipeline status :**
 
-- st_CarbonApp
+[![pipeline_rainfall_monthly_schedule](https://github.com/iDataEngineer/Analytics-Engineering/actions/workflows/pipeline_rainfall_monthly.yml/badge.svg)](https://github.com/iDataEngineer/Analytics-Engineering/actions/workflows/pipeline_rainfall_monthly.yml)
 
-- The app provides insight into graphical trends and statistical summary.
+**Languages / Tools :**
 
-**Front End...Part 2** - Data analytics using [power BI](powerBI/PBI%20rainfall.pbix) - connected to SEPA_Monthly.csv.
-
-**Pipeline status :** Work in progress...
-
-**Languages / Tools : ** See [requirements file](req/req_rain_app.txt) for this app.
-
+- See [requirements file](req/req_rain_app.txt) for this app.
