@@ -1,7 +1,7 @@
 name: pipeline_rainfall_monthly_schedule
 on:
   schedule: # 7am UTC on the second of the month
-    - cron: "58 13 10 * *"
+    - cron: "10 14 10 * *"
 
 jobs:
   build:
