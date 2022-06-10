@@ -1,8 +1,10 @@
 name: pipeline_rainfall_monthly_schedule
 on:
   schedule: # 7am UTC on the second of the month
-    - cron: "25 * * * *"
-
+    - cron: "45 * * * *"
+  branches:
+    include:
+    - main
 jobs:
   build:
     runs-on: ubuntu-latest
